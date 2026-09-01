@@ -1,0 +1,17 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+  <div class="card">
+    <h2>Audio Archives</h2>
+    <a class="button" href="{% url 'newsroom:audio_create' %}">Upload Audio</a>
+    {% for a in archives %}
+      <div style="margin-bottom:12px;">
+        <strong>{{ a.title }}</strong>
+        <div>{{ a.description|truncatechars:140 }}</div>
+        <div>File: <a href="{{ a.file.url }}">Download</a> | Archived: {{ a.archived_at|date:'M d, Y H:i' }}</div>
+      </div>
+    {% empty %}
+      <p>No audio archives yet.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

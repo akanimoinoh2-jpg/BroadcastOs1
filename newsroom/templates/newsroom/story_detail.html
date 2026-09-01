@@ -1,0 +1,79 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>{{ story.title }}</h2>
+        <p><strong>Status:</strong> {{ story.get_status_display }}</p>
+        <p><strong>Assigned to:</strong> {{ story.assigned_to }}</p>
+        <p><strong>Headline suggestions:</strong></p>
+        <ul>
+            {% for headline in story.headline_suggestions %}
+                <li>{{ headline }}</li>
+            {% empty %}
+                <li>No suggestions yet.</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Tags:</strong> {{ story.suggested_tags|join:", " }}</p>
+        <p><strong>Summary:</strong> {{ story.summary }}</p>
+        <p>{{ story.body|linebreaks }}</p>
+        <p><strong>AI Notes:</strong> {{ story.ai_notes }}</p>
+        <div>
+            <a class="button" href="{% url 'newsroom:story_edit' story.slug %}">Edit Story</a>
+            <a class="button secondary" href="{% url 'newsroom:story_generate_ai' story.slug %}">Refresh AI Drafts</a>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Images</h3>
+        <div class="media-grid">
+            {% for img in images %}
+                <div class="media-item">
+                    <img src="{{ img.file.url }}" alt="{{ img.caption }}" style="max-width:240px; height:auto;" />
+                    <p>{{ img.caption }}</p>
+                </div>
+            {% empty %}
+                <p>No images yet.</p>
+            {% endfor %}
+        </div>
+        <form method="post" action="{% url 'newsroom:image_upload' story.slug %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ image_form.as_p }}
+            <button type="submit">Upload Image</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Videos</h3>
+        <div class="media-grid">
+            {% for vid in videos %}
+                <div class="media-item">
+                    <video controls style="max-width:480px; height:auto;">
+                        <source src="{{ vid.file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <p>{{ vid.caption }}</p>
+                </div>
+            {% empty %}
+                <p>No videos yet.</p>
+            {% endfor %}
+        </div>
+        <form method="post" action="{% url 'newsroom:video_upload' story.slug %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ video_form.as_p }}
+            <button type="submit">Upload Video</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Audio</h3>
+        <ul>
+            {% for a in story.audio_archives.all %}
+                <li>
+                    <audio controls src="{{ a.file.url }}"></audio>
+                    <strong>{{ a.title }}</strong> - {{ a.description }}
+                </li>
+            {% empty %}
+                <li>No audio uploaded.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

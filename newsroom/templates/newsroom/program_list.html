@@ -1,0 +1,20 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Programme Scheduling</h2>
+        <a class="button" href="{% url 'newsroom:program_create' %}">Create Programme</a>
+    </div>
+    {% for program in programs %}
+        <div class="card">
+            <h3>{{ program.title }}</h3>
+            <p>{{ program.description|truncatechars:160 }}</p>
+            <div>Start: {{ program.start_time|date:'M d, Y H:i' }} | Status: {{ program.get_status_display }}</div>
+            <div><a class="button secondary" href="{% url 'newsroom:program_edit' program.pk %}">Edit</a></div>
+        </div>
+    {% empty %}
+        <div class="card">
+            <p>No programmes found yet.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

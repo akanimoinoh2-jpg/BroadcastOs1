@@ -1,0 +1,28 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+  <div class="card">
+    <h2>AI Assistant</h2>
+    <p>Paste story text or notes and choose an action.</p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Run</button>
+    </form>
+
+    {% if result %}
+      <div class="card">
+        <h3>Result</h3>
+        {% if is_list %}
+          <ul>
+            {% for item in result %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <pre style="white-space:pre-wrap;">{{ result }}</pre>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

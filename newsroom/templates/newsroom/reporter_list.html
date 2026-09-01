@@ -1,0 +1,22 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Reporter Management</h2>
+        <p>Assign reporters to stories and manage coverage.</p>
+        <a class="button" href="{% url 'newsroom:story_create' %}">New Story</a>
+        <a class="button secondary" href="{% url 'newsroom:system_overview' %}">System Overview</a>
+    </div>
+
+    {% for rep in reporters %}
+        <div class="card">
+            <h3>{{ rep.full_name }}</h3>
+            <div>{{ rep.story_count }} assigned story{{ rep.story_count|pluralize }} | {{ rep.active_count }} active</div>
+            <div><a class="button secondary" href="{% url 'newsroom:story_list' %}">View Stories</a></div>
+        </div>
+    {% empty %}
+        <div class="card">
+            <p>No reporters found. Register team members with the Reporter role.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

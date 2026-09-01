@@ -1,0 +1,26 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card profile-card">
+        <div class="profile-header">
+            {% if profile_obj.profile_picture %}
+                <img class="avatar" src="{{ profile_obj.profile_picture.url }}" alt="{{ user.username }}'s profile picture">
+            {% else %}
+                <div class="avatar avatar-placeholder">{{ user.username|first|upper }}</div>
+            {% endif %}
+            <div>
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <p>{{ profile_obj.get_role_display }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Edit Profile</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button">Save Profile</button>
+        </form>
+    </div>
+{% endblock %}

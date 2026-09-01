@@ -1,0 +1,19 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Notifications</h2>
+        <a class="button" href="{% url 'newsroom:notification_create' %}">Send Notification</a>
+    </div>
+    {% for notification in notifications %}
+        <div class="card">
+            <h3>{{ notification.title }}</h3>
+            <p>{{ notification.message|truncatechars:180 }}</p>
+            <p>Level: {{ notification.get_level_display }} | Read: {{ notification.is_read }}</p>
+        </div>
+    {% empty %}
+        <div class="card">
+            <p>No notifications have been sent yet.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

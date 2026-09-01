@@ -1,0 +1,19 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Create Notification</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color: #f88;">{{ field.errors }}</div>
+                {% endif %}
+            {% endfor %}
+            <button class="button" type="submit">Send Notification</button>
+        </form>
+    </div>
+{% endblock %}

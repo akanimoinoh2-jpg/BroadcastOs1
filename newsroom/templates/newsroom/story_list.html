@@ -1,0 +1,16 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Stories</h2>
+        {% for story in stories %}
+            <div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #333;">
+                <h3><a href="{% url 'newsroom:story_detail' story.slug %}">{{ story.title }}</a></h3>
+                <p>{{ story.summary|truncatechars:180 }}</p>
+                <div>Status: {{ story.get_status_display }} | Assigned to: {{ story.assigned_to }}</div>
+            </div>
+        {% empty %}
+            <p>No newsroom stories found.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

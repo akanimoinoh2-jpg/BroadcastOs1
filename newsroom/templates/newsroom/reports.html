@@ -1,0 +1,55 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Reports</h2>
+        <p>Operational reports across the newsroom.</p>
+        <a class="button secondary" href="{% url 'newsroom:system_overview' %}">System Overview</a>
+    </div>
+
+    <div class="card">
+        <h3>Totals</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;">
+            <div><strong>{{ total_stories }}</strong> Stories</div>
+            <div><strong>{{ total_programs }}</strong> Programmes</div>
+            <div><strong>{{ total_incidents }}</strong> Incidents</div>
+            <div><strong>{{ total_slots }}</strong> Broadcast Slots</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Stories by Status</h3>
+        {% for item in story_status %}
+            <div style="margin-bottom:10px;"><strong>{{ item.status|title }}</strong> — {{ item.count }}</div>
+        {% empty %}
+            <p>No stories.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Programmes by Status</h3>
+        {% for item in program_status %}
+            <div style="margin-bottom:10px;"><strong>{{ item.status|title }}</strong> — {{ item.count }}</div>
+        {% empty %}
+            <p>No programmes.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Incidents by Status</h3>
+        {% for item in incident_status %}
+            <div style="margin-bottom:10px;"><strong>{{ item.status|title }}</strong> — {{ item.count }}</div>
+        {% empty %}
+            <p>No incidents.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Broadcast Slots by Status</h3>
+        {% for item in slot_status %}
+            <div style="margin-bottom:10px;"><strong>{{ item.status|title }}</strong> — {{ item.count }}</div>
+        {% empty %}
+            <p>No slots.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

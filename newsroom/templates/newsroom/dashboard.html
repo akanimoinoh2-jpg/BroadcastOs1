@@ -1,0 +1,78 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>BroadcastOS Dashboard</h2>
+        <p>Overview of newsroom operations, schedule, alerts, and AI workflows.</p>
+    </div>
+
+    <div class="card">
+        <h3>Live & Upcoming Programmes</h3>
+        {% for program in programs %}
+            <div style="margin-bottom: 12px;">
+                <strong>{{ program.title }}</strong>
+                <div>Start: {{ program.start_time|date:'M d, Y H:i' }} | Status: {{ program.get_status_display }}</div>
+            </div>
+        {% empty %}
+            <p>No active programmes currently scheduled.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Upcoming Broadcast Slots</h3>
+        {% for slot in upcoming_slots %}
+            <div style="margin-bottom: 12px;">
+                <strong>{{ slot.program.title }}</strong> — {{ slot.scheduled_time|date:'M d, Y H:i' }}
+                <div>Story: {% if slot.story %}{{ slot.story.title }}{% else %}Unassigned{% endif %} | Studio: {{ slot.studio }}</div>
+            </div>
+        {% empty %}
+            <p>No upcoming slots scheduled.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Latest Stories</h3>
+        {% for story in stories %}
+            <div style="margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #333;">
+                <strong><a href="{% url 'newsroom:story_detail' story.slug %}">{{ story.title }}</a></strong>
+                <div>Status: {{ story.get_status_display }} | Updated: {{ story.updated_at|date:'M d, Y H:i' }}</div>
+                {% with first_image=story.images.first first_video=story.videos.first %}
+                    {% if first_image and first_image.file %}
+                        <div style="margin-top: 10px;">
+                            <img src="{{ first_image.file.url }}" alt="{{ first_image.caption }}" style="max-width: 240px; max-height: 160px; border-radius: 8px; object-fit: cover;" />
+                        </div>
+                    {% endif %}
+                    {% if first_video and first_video.file %}
+                        <div style="margin-top: 10px;">
+                            <video controls style="max-width: 320px; max-height: 180px; border-radius: 8px; background: #000;">
+                                <source src="{{ first_video.file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% empty %}
+            <p>No stories have been created yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Incident Register</h3>
+        <p>{{ incident_count }} open or investigating incident(s).</p>
+        <a class="button" href="{% url 'newsroom:incident_list' %}">View Incidents</a>
+    </div>
+
+    <div class="card">
+        <h3>Recent Notifications</h3>
+        {% for notification in notifications %}
+            <div style="margin-bottom: 10px;">
+                <strong>{{ notification.title }}</strong>
+                <div>{{ notification.message|truncatechars:120 }}</div>
+            </div>
+        {% empty %}
+            <p>No unread notifications.</p>
+        {% endfor %}
+        <a class="button secondary" href="{% url 'newsroom:notification_list' %}">Manage Notifications</a>
+    </div>
+{% endblock %}

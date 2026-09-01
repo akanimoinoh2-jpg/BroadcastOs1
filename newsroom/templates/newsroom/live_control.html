@@ -1,0 +1,32 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Live Broadcast Control</h2>
+        <p>Control live broadcast slots and on-air status.</p>
+        <a class="button" href="{% url 'newsroom:slot_create' %}">New Slot</a>
+        <a class="button secondary" href="{% url 'newsroom:system_overview' %}">System Overview</a>
+    </div>
+
+    {% for slot in slots %}
+        <div class="card">
+            <h3>{{ slot.program.title }} — {{ slot.scheduled_time|date:'M d, Y H:i' }}</h3>
+            <div>Story: {% if slot.story %}{{ slot.story.title }}{% else %}Unassigned{% endif %} | Studio: {{ slot.studio|default:'Unassigned' }} | Duration: {{ slot.duration_minutes }}m</div>
+            <div style="margin-top: 8px;">Status: <strong>{{ slot.get_status_display }}</strong></div>
+            <form method="post" action="{% url 'newsroom:live_control' %}" style="margin-top: 10px;">
+                {% csrf_token %}
+                <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                <select name="status">
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if slot.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="button" style="margin-left: 8px;">Update</button>
+            </form>
+        </div>
+    {% empty %}
+        <div class="card">
+            <p>No broadcast slots scheduled yet.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Broadcast Slots</h2>
+        <a class="button" href="{% url 'newsroom:slot_create' %}">Create Slot</a>
+    </div>
+    {% for slot in slots %}
+        <div class="card">
+            <h3>{{ slot.program.title }} - {{ slot.scheduled_time|date:'M d, Y H:i' }}</h3>
+            <p>Story: {% if slot.story %}{{ slot.story.title }}{% else %}No story assigned{% endif %}</p>
+            <p>Studio: {{ slot.studio }} | Duration: {{ slot.duration_minutes }} minutes</p>
+            <div>Status: {{ slot.get_status_display }}</div>
+            <div><a class="button secondary" href="{% url 'newsroom:slot_edit' slot.pk %}">Edit Slot</a></div>
+        </div>
+    {% empty %}
+        <div class="card">
+            <p>No broadcast slots scheduled yet.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

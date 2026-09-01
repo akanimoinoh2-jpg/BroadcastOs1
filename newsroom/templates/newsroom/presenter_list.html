@@ -1,0 +1,22 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Presenter Management</h2>
+        <p>Manage presenters and programme hosts.</p>
+        <a class="button" href="{% url 'newsroom:program_create' %}">New Programme</a>
+        <a class="button secondary" href="{% url 'newsroom:system_overview' %}">System Overview</a>
+    </div>
+
+    {% for pres in presenters %}
+        <div class="card">
+            <h3>{{ pres.full_name }}</h3>
+            <div>{{ pres.program_count }} programme{{ pres.program_count|pluralize }} | {{ pres.upcoming_count }} upcoming or on air</div>
+            <div><a class="button secondary" href="{% url 'newsroom:program_list' %}">View Programmes</a></div>
+        </div>
+    {% empty %}
+        <div class="card">
+            <p>No presenters found. Register team members with the Presenter role.</p>
+        </div>
+    {% endfor %}
+{% endblock %}

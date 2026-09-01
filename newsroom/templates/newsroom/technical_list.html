@@ -1,0 +1,33 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card">
+        <h2>Technical Operations</h2>
+        <p>Manage studios, technical leads and broadcast equipment.</p>
+        <a class="button secondary" href="{% url 'newsroom:system_overview' %}">System Overview</a>
+    </div>
+
+    <div class="card">
+        <h3>Studios</h3>
+        {% for studio in studios %}
+            <div style="margin-bottom: 12px;">
+                <strong>{{ studio.name }}</strong> — {{ studio.location|default:'No location' }}
+                <div>{{ studio.capacity }} capacity | {% if studio.is_active %}Active{% else %}Inactive{% endif %}</div>
+            </div>
+        {% empty %}
+            <p>No studios configured.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Programmes with Technical Leads</h3>
+        {% for program in technical_programs %}
+            <div style="margin-bottom: 12px;">
+                <strong>{{ program.title }}</strong>
+                <div>Technical Lead: {{ program.technical_lead }} | Start: {{ program.start_time|date:'M d, Y H:i' }} | Status: {{ program.get_status_display }}</div>
+            </div>
+        {% empty %}
+            <p>No programmes with assigned technical leads.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,338 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+<style>
+    .sys-hero {
+        background: linear-gradient(135deg, #16182a 0%, #1a1a1a 100%);
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 28px 24px;
+        margin-bottom: 28px;
+    }
+    .sys-hero h1 { margin: 0 0 8px; font-size: 26px; letter-spacing: 0.4px; }
+    .sys-hero p { margin: 0; color: #9a9a9a; max-width: 760px; }
+    .sys-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .sys-badge {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: #1f1f1f; border: 1px solid #333; border-radius: 999px;
+        padding: 6px 14px; font-size: 12.5px; color: #cfcfcf;
+    }
+    .sys-badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .sys-section { margin-bottom: 30px; }
+    .sys-section-head {
+        display: flex; align-items: center; gap: 12px;
+        padding: 13px 20px; border-radius: 10px 10px 0 0; color: #fff;
+    }
+    .sys-section-head .icon { width: 22px; height: 22px; flex: 0 0 auto; }
+    .sys-section-head h2 { margin: 0; font-size: 17px; font-weight: 600; }
+    .sys-section-head .count { margin-left: auto; font-size: 12.5px; opacity: 0.85; }
+    .sys-section-body {
+        background: #1a1a1a; border: 1px solid #333; border-top: none;
+        border-radius: 0 0 10px 10px; padding: 20px;
+    }
+
+    .sys-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+    .sys-card {
+        background: #161616; border: 1px solid #2c2c2c; border-radius: 10px;
+        padding: 15px; display: flex; flex-direction: column; gap: 10px;
+        min-height: 118px; transition: border-color .15s ease, transform .15s ease;
+    }
+    .sys-card:hover { border-color: #4a4a4a; transform: translateY(-2px); }
+    .sys-card .top { display: flex; align-items: center; gap: 10px; }
+    .sys-card .card-icon {
+        width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .sys-card .card-icon svg { width: 19px; height: 19px; }
+    .sys-card h3 { margin: 0; font-size: 14.5px; font-weight: 600; }
+    .sys-card p { margin: 0; font-size: 12.5px; color: #9a9a9a; line-height: 1.5; }
+    .sys-card .status {
+        margin-top: auto; font-size: 11.5px; font-weight: 600; letter-spacing: 0.3px;
+        padding: 3px 9px; border-radius: 999px; align-self: flex-start;
+    }
+    .status-live { background: #123a24; color: #5fd47a; }
+
+    /* Roles */
+    .role-row { display: flex; flex-wrap: wrap; gap: 12px; }
+    .role-card {
+        display: flex; align-items: center; gap: 12px; flex: 1 1 220px;
+        background: #161616; border: 1px solid #2c2c2c; border-radius: 10px; padding: 13px 15px;
+    }
+    .role-card .role-avatar {
+        width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto;
+        display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px;
+    }
+    .role-card .role-info { display: flex; flex-direction: column; }
+    .role-card .role-name { font-size: 13.5px; font-weight: 600; }
+    .role-card .role-count { font-size: 12px; color: #9a9a9a; }
+
+    /* Access layer */
+    .access-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+    .access-card {
+        background: #161616; border: 1px solid #2c2c2c; border-radius: 10px; padding: 16px;
+        display: flex; gap: 12px; align-items: flex-start;
+    }
+    .access-card .card-icon {
+        width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .access-card .card-icon svg { width: 19px; height: 19px; }
+    .access-card h3 { margin: 0 0 4px; font-size: 14px; }
+    .access-card p { margin: 0; font-size: 12.5px; color: #9a9a9a; line-height: 1.5; }
+
+    /* Workflow */
+    .workflow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; }
+    .flow-step {
+        flex: 1 1 150px; background: #161616; border: 1px solid #2c2c2c; border-radius: 10px;
+        padding: 14px; display: flex; flex-direction: column; gap: 8px; position: relative;
+    }
+    .flow-step .step-no {
+        width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 12.5px; font-weight: 700; color: #fff; flex: 0 0 auto;
+    }
+    .flow-step h3 { margin: 0; font-size: 13.5px; font-weight: 600; }
+    .flow-step p { margin: 0; font-size: 12px; color: #9a9a9a; }
+    .flow-step .step-count { font-size: 12px; font-weight: 600; margin-top: auto; }
+    .flow-connector {
+        width: 34px; flex: 0 0 34px; display: flex; align-items: center; justify-content: center;
+    }
+    .flow-connector svg { width: 24px; height: 24px; }
+
+    /* AI */
+    .ai-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+    .ai-card { background: #161616; border: 1px solid #2c2c2c; border-radius: 10px; padding: 16px; }
+    .ai-card .top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .ai-card .card-icon {
+        width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .ai-card .card-icon svg { width: 19px; height: 19px; }
+    .ai-card h3 { margin: 0; font-size: 14.5px; font-weight: 600; }
+    .ai-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .ai-tag {
+        background: #232323; border: 1px solid #333; border-radius: 999px;
+        padding: 4px 11px; font-size: 12px; color: #d4c94a;
+    }
+
+    /* Data */
+    .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+    .data-card {
+        background: #161616; border: 1px solid #2c2c2c; border-radius: 10px; padding: 16px;
+        display: flex; flex-direction: column; gap: 6px;
+    }
+    .data-card .num { font-size: 26px; font-weight: 700; color: #5fd47a; }
+    .data-card .label { font-size: 12.5px; color: #9a9a9a; }
+    .data-card .card-icon {
+        width: 34px; height: 34px; border-radius: 8px; flex: 0 0 auto;
+        display: flex; align-items: center; justify-content: center; margin-bottom: 6px;
+    }
+    .data-card .card-icon svg { width: 19px; height: 19px; }
+
+    .sys-footnote { color: #6f6f6f; font-size: 12px; margin-top: 8px; }
+
+    @media (max-width: 640px) {
+        .workflow { flex-direction: column; }
+        .flow-connector { width: 100%; flex-basis: 26px; transform: rotate(90deg); }
+    }
+</style>
+
+<div class="sys-hero">
+    <h1>BroadcastOS System Overview</h1>
+    <p>A cloud-hosted broadcast & newsroom platform. Explore the modules, roles and end-to-end editorial workflow that power the newsroom.</p>
+    <div class="sys-badges">
+        <span class="sys-badge"><span class="dot" style="background:#4a90d9"></span>{{ roles|length }} User Roles</span>
+        <span class="sys-badge"><span class="dot" style="background:#9b6fd4"></span>{{ modules|length }} Platform Modules</span>
+        <span class="sys-badge"><span class="dot" style="background:#d96a6a"></span>{{ workflow_stages|length }}-Stage Workflow</span>
+        <span class="sys-badge"><span class="dot" style="background:#d4c94a"></span>{{ ai_services|length }} AI Services</span>
+        <span class="sys-badge"><span class="dot" style="background:#5fd47a"></span>Cloud Hosted</span>
+    </div>
+</div>
+
+<!-- Users & Roles -->
+<div class="sys-section">
+    <div class="sys-section-head" style="background:#1e3a5f;">
+        <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <h2>Users & Roles</h2>
+        <span class="count">{{ roles|length }} roles</span>
+    </div>
+    <div class="sys-section-body">
+        <div class="role-row">
+            {% for role in roles %}
+                <div class="role-card">
+                    <div class="role-avatar" style="background:{{ role.color }};">{{ role.initial }}</div>
+                    <div class="role-info">
+                        <span class="role-name">{{ role.label }}</span>
+                        <span class="role-count">{{ role.count }} user{{ role.count|pluralize }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <p class="sys-footnote">Role-based access controls what each team member can see and do across the platform.</p>
+    </div>
+</div>
+
+<!-- Access Layer -->
+<div class="sys-section">
+    <div class="sys-section-head" style="background:#0f5f5c;">
+        <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        <h2>Access Layer</h2>
+        <span class="count">3 access channels</span>
+    </div>
+    <div class="sys-section-body">
+        <div class="access-grid">
+            {% for access in access_layer %}
+                <div class="access-card">
+                    <div class="card-icon" style="background:rgba(46,168,160,0.16);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#2ea8a0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            {% if forloop.first %}
+                                <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+                            {% elif forloop.counter == 2 %}
+                                <rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>
+                            {% else %}
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
+                            {% endif %}
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>{{ access.title }}</h3>
+                        <p>{{ access.description }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Platform Modules -->
+<div class="sys-section">
+    <div class="sys-section-head" style="background:#4a2d7a;">
+        <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        </span>
+        <h2>BroadcastOS Platform — Modules</h2>
+        <span class="count">{{ modules|length }} modules</span>
+    </div>
+    <div class="sys-section-body">
+        <div class="sys-grid">
+            {% for module in modules %}
+                <a class="sys-card" href="{{ module.url }}">
+                    <div class="top">
+                        <div class="card-icon" style="background:{{ module.bg }};">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="{{ module.color }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">{{ module.icon|safe }}</svg>
+                        </div>
+                        <h3>{{ module.name }}</h3>
+                    </div>
+                    <p>{{ module.description }}</p>
+                    <span class="status status-live">● Live</span>
+                </a>
+            {% endfor %}
+        </div>
+        <p class="sys-footnote">Every module below is live. Click any card to open its workspace.</p>
+    </div>
+</div>
+
+<!-- Newsroom & Broadcast Workflow -->
+<div class="sys-section">
+    <div class="sys-section-head" style="background:#7a2d2d;">
+        <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M7 7h10M7 7l4 8M17 7l-4 8"/></svg>
+        </span>
+        <h2>Newsroom & Broadcast Workflow</h2>
+        <span class="count">{{ workflow_stages|length }} stages</span>
+    </div>
+    <div class="sys-section-body">
+        <div class="workflow">
+            {% for stage in workflow_stages %}
+                <div class="flow-step">
+                    <div class="step-no" style="background:{{ stage.color }};">{{ forloop.counter }}</div>
+                    <h3>{{ stage.label }}</h3>
+                    <p>{{ stage.description }}</p>
+                    <div class="step-count" style="color:{{ stage.color }};">{{ stage.count|default:0 }} record{{ stage.count|pluralize }}</div>
+                </div>
+                {% if not forloop.last %}
+                    <div class="flow-connector">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#d96a6a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <p class="sys-footnote">Live counts reflect the number of stories currently in each stage of the editorial pipeline.</p>
+    </div>
+</div>
+
+<!-- AI Services -->
+<div class="sys-section">
+    <div class="sys-section-head" style="background:#7a6a2d;">
+        <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.9 5.8L20 9.7l-6.1 1.9L12 17l-1.9-5.4L4 9.7l6.1-1.9L12 2z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg>
+        </span>
+        <h2>AI Services</h2>
+        <span class="count">{{ ai_services|length }} service groups</span>
+    </div>
+    <div class="sys-section-body">
+        <div class="ai-grid">
+            {% for service in ai_services %}
+                <div class="ai-card">
+                    <div class="top">
+                        <div class="card-icon" style="background:rgba(212,201,74,0.16);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#d4c94a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                {% if forloop.first %}
+                                    <path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/>
+                                {% else %}
+                                    <path d="M21 12a9 9 0 1 1-9-9"/><path d="M12 7v5l3 3"/>
+                                {% endif %}
+                            </svg>
+                        </div>
+                        <h3>{{ service.title }}</h3>
+                    </div>
+                    <div class="ai-tags">
+                        {% for item in service.items %}
+                            <span class="ai-tag">{{ item }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <p class="sys-footnote">AI tools generate headlines, scripts, interview questions, summaries, translations and social media content to speed up the newsroom.</p>
+    </div>
+</div>
+
+<!-- Data & Platform Services -->
+<div class="sys-section">
+    <div class="sys-section-head" style="background:#2d5f3a;">
+        <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </span>
+        <h2>Data & Platform Services</h2>
+        <span class="count">Core database & storage</span>
+    </div>
+    <div class="sys-section-body">
+        <div class="data-grid">
+            {% for data in data_services %}
+                <div class="data-card">
+                    <div class="card-icon" style="background:rgba(95,212,122,0.14);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#5fd47a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">{{ data.icon|safe }}</svg>
+                    </div>
+                    <div class="num">{{ data.count }}</div>
+                    <div class="label">{{ data.label }}</div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="data-grid" style="margin-top:14px;">
+            <div class="data-card">
+                <div class="card-icon" style="background:rgba(95,212,122,0.14);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#5fd47a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div style="font-size:14px;font-weight:600;color:#cfcfcf;">File Storage & Audio Archive</div>
+                <div class="label" style="margin-top:4px;">Automatic backups verified for {{ backup_verified }} of {{ audio_archives_count }} audio archive{{ audio_archives_count|pluralize }}.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

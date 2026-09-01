@@ -1,0 +1,56 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+<style>
+    .chart-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .chart-label { width: 140px; flex: 0 0 140px; font-size: 13px; }
+    .chart-track { flex: 1; background: #0f0f0f; border-radius: 6px; height: 18px; overflow: hidden; }
+    .chart-bar { height: 100%; border-radius: 6px; }
+    .chart-count { width: 50px; flex: 0 0 50px; text-align: right; font-weight: 600; font-size: 13px; }
+</style>
+
+    <div class="card">
+        <h2>Analytics</h2>
+        <p>Track performance, engagement and operational metrics.</p>
+        <a class="button secondary" href="{% url 'newsroom:system_overview' %}">System Overview</a>
+    </div>
+
+    <div class="card">
+        <h3>Stories by Status</h3>
+        {% for item in story_by_status %}
+            <div class="chart-row">
+                <div class="chart-label">{{ item.status|title }}</div>
+                <div class="chart-track"><div class="chart-bar" style="width: {{ item.width }}%; background:#9b6fd4;"></div></div>
+                <div class="chart-count">{{ item.count }}</div>
+            </div>
+        {% empty %}
+            <p>No stories.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Programmes by Status</h3>
+        {% for item in program_by_status %}
+            <div class="chart-row">
+                <div class="chart-label">{{ item.status|title }}</div>
+                <div class="chart-track"><div class="chart-bar" style="width: {{ item.width }}%; background:#d9a24a;"></div></div>
+                <div class="chart-count">{{ item.count }}</div>
+            </div>
+        {% empty %}
+            <p>No programmes.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Incidents by Severity</h3>
+        {% for item in incident_by_severity %}
+            <div class="chart-row">
+                <div class="chart-label">{{ item.severity|title }}</div>
+                <div class="chart-track"><div class="chart-bar" style="width: {{ item.width }}%; background:#d96a6a;"></div></div>
+                <div class="chart-count">{{ item.count }}</div>
+            </div>
+        {% empty %}
+            <p>No incidents.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

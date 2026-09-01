@@ -1,0 +1,13 @@
+{% extends 'newsroom/base.html' %}
+
+{% block content %}
+    <div class="card" style="max-width: 560px; margin: 30px auto;">
+        <h2>Create your BroadcastOS account</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="button" type="submit">Create account</button>
+        </form>
+        <p>Already have an account? <a href="/accounts/login/">Log in here</a>.</p>
+    </div>
+{% endblock %}
