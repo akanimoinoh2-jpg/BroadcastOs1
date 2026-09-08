@@ -27,9 +27,14 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7ww*!9&4g2sau(y%srho-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 't')
 
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+def _csv(name, default):
+    """Read a comma-separated env var, stripping stray whitespace and quotes."""
+    raw = os.environ.get(name, default)
+    return [item.strip().strip('"\'') for item in raw.split(',') if item.strip().strip('"\'')]
 
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.onrender.com,http://*.onrender.com,https://*.railway.app').split(',') if o.strip()]
+ALLOWED_HOSTS = _csv('ALLOWED_HOSTS', '.onrender.com,localhost,127.0.0.1')
+
+CSRF_TRUSTED_ORIGINS = _csv('CSRF_TRUSTED_ORIGINS', 'https://*.onrender.com,http://*.onrender.com,https://*.railway.app')
 
 
 # Application definition
