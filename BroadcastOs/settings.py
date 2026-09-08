@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-7ww*!9&4g2sau(y%srho-xr$0%hzv()j(u5j7tl*z==rdczwul')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 't')
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 't')
 
 def _csv(name, default):
     """Read a comma-separated env var, stripping stray whitespace and quotes."""
