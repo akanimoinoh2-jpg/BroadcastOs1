@@ -1,6 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, get_user_model, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -11,7 +10,6 @@ from .forms import (
     IncidentReportForm,
     NotificationForm,
     ProgramForm,
-    RegistrationForm,
     StoryForm,
 )
 from .models import (
@@ -42,28 +40,6 @@ from .services import (
 User = get_user_model()
 
 
-def register(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            authenticated_user = authenticate(
-                request,
-                username=user.username,
-                password=form.cleaned_data['password1'],
-            )
-            if authenticated_user is not None:
-                login(request, authenticated_user)
-                messages.success(request, 'Account created successfully. Welcome to BroadcastOS.')
-                return redirect('newsroom:dashboard')
-            messages.success(request, 'Account created successfully. Please log in.')
-            return redirect('login')
-    else:
-        form = RegistrationForm()
-    return render(request, 'registration/register.html', {'form': form})
-
-
-@login_required
 def profile(request):
     profile_obj, _ = UserProfile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
@@ -78,12 +54,9 @@ def profile(request):
 
 
 def home(request):
-    if request.user.is_authenticated:
-        return redirect('newsroom:dashboard')
-    return redirect('login')
+    return redirect('newsroom:dashboard')
 
 
-@login_required
 def dashboard(request):
     stories = Story.objects.prefetch_related('images', 'videos').order_by('-updated_at')[:6]
     programs = Program.objects.filter(status__in=['scheduled', 'on_air']).order_by('start_time')[:5]
@@ -101,7 +74,6 @@ def dashboard(request):
     })
 
 
-@login_required
 def system_overview(request):
     # ---- Users & Roles ----
     role_data = dict(UserProfile.objects.values_list('role').annotate(count=Count('id')))
@@ -222,7 +194,6 @@ def system_overview(request):
     })
 
 
-@login_required
 def reporter_list(request):
     reporters = User.objects.filter(userprofile__role='reporter').order_by('username')
     data = []
@@ -237,7 +208,6 @@ def reporter_list(request):
     return render(request, 'newsroom/reporter_list.html', {'reporters': data})
 
 
-@login_required
 def presenter_list(request):
     presenters = User.objects.filter(userprofile__role='presenter').order_by('username')
     data = []
@@ -252,14 +222,12 @@ def presenter_list(request):
     return render(request, 'newsroom/presenter_list.html', {'presenters': data})
 
 
-@login_required
 def technical_list(request):
     studios = Studio.objects.all()
     technical_programs = Program.objects.filter(technical_lead__isnull=False).select_related('technical_lead').order_by('-start_time')[:10]
     return render(request, 'newsroom/technical_list.html', {'studios': studios, 'technical_programs': technical_programs})
 
 
-@login_required
 def live_control(request):
     if request.method == 'POST':
         slot_id = request.POST.get('slot_id')
@@ -275,7 +243,6 @@ def live_control(request):
     return render(request, 'newsroom/live_control.html', {'slots': slots, 'status_choices': BroadcastSlot.STATUS_CHOICES})
 
 
-@login_required
 def reports(request):
     story_status = Story.objects.values('status').annotate(count=Count('id')).order_by('status')
     program_status = Program.objects.values('status').annotate(count=Count('id')).order_by('status')
@@ -293,7 +260,6 @@ def reports(request):
     })
 
 
-@login_required
 def analytics(request):
     story_by_status = list(Story.objects.values('status').annotate(count=Count('id')).order_by('status'))
     program_by_status = list(Program.objects.values('status').annotate(count=Count('id')).order_by('status'))
@@ -321,13 +287,11 @@ def analytics(request):
     })
 
 
-@login_required
 def story_list(request):
     stories = Story.objects.order_by('-published_at', '-updated_at')
     return render(request, 'newsroom/story_list.html', {'stories': stories})
 
 
-@login_required
 def story_detail(request, slug):
     story = get_object_or_404(Story, slug=slug)
     image_form = ImageAssetForm()
@@ -343,7 +307,6 @@ def story_detail(request, slug):
     })
 
 
-@login_required
 def image_upload(request, slug):
     story = get_object_or_404(Story, slug=slug)
     if request.method == 'POST':
@@ -356,7 +319,6 @@ def image_upload(request, slug):
     return redirect(reverse('newsroom:story_detail', args=[story.slug]))
 
 
-@login_required
 def video_upload(request, slug):
     story = get_object_or_404(Story, slug=slug)
     if request.method == 'POST':
@@ -389,7 +351,6 @@ def _save_story_media(story, form, user):
         )
 
 
-@login_required
 def story_create(request):
     if request.method == 'POST':
         form = StoryForm(request.POST, request.FILES)
@@ -404,7 +365,6 @@ def story_create(request):
     return render(request, 'newsroom/story_form.html', {'form': form})
 
 
-@login_required
 def story_edit(request, slug):
     story = get_object_or_404(Story, slug=slug)
     if request.method == 'POST':
@@ -418,7 +378,6 @@ def story_edit(request, slug):
     return render(request, 'newsroom/story_form.html', {'form': form, 'story': story})
 
 
-@login_required
 def story_generate_ai(request, slug):
     story = get_object_or_404(Story, slug=slug)
     story.generate_ai_summary()
@@ -430,13 +389,11 @@ def story_generate_ai(request, slug):
     return redirect(reverse('newsroom:story_detail', args=[story.slug]))
 
 
-@login_required
 def program_list(request):
     programs = Program.objects.order_by('-start_time')
     return render(request, 'newsroom/program_list.html', {'programs': programs})
 
 
-@login_required
 def program_create(request):
     if request.method == 'POST':
         form = ProgramForm(request.POST)
@@ -448,7 +405,6 @@ def program_create(request):
     return render(request, 'newsroom/program_form.html', {'form': form})
 
 
-@login_required
 def program_edit(request, pk):
     program = get_object_or_404(Program, pk=pk)
     if request.method == 'POST':
@@ -461,13 +417,11 @@ def program_edit(request, pk):
     return render(request, 'newsroom/program_form.html', {'form': form, 'program': program})
 
 
-@login_required
 def slot_list(request):
     slots = BroadcastSlot.objects.order_by('scheduled_time')
     return render(request, 'newsroom/slot_list.html', {'slots': slots})
 
 
-@login_required
 def slot_create(request):
     if request.method == 'POST':
         form = BroadcastSlotForm(request.POST)
@@ -479,7 +433,6 @@ def slot_create(request):
     return render(request, 'newsroom/slot_form.html', {'form': form})
 
 
-@login_required
 def slot_edit(request, pk):
     slot = get_object_or_404(BroadcastSlot, pk=pk)
     if request.method == 'POST':
@@ -492,13 +445,11 @@ def slot_edit(request, pk):
     return render(request, 'newsroom/slot_form.html', {'form': form, 'slot': slot})
 
 
-@login_required
 def incident_list(request):
     incidents = IncidentReport.objects.order_by('-created_at')
     return render(request, 'newsroom/incident_list.html', {'incidents': incidents})
 
 
-@login_required
 def incident_create(request):
     if request.method == 'POST':
         form = IncidentReportForm(request.POST)
@@ -512,7 +463,6 @@ def incident_create(request):
     return render(request, 'newsroom/incident_form.html', {'form': form})
 
 
-@login_required
 def incident_edit(request, pk):
     incident = get_object_or_404(IncidentReport, pk=pk)
     if request.method == 'POST':
@@ -525,13 +475,11 @@ def incident_edit(request, pk):
     return render(request, 'newsroom/incident_form.html', {'form': form, 'incident': incident})
 
 
-@login_required
 def notification_list(request):
     notifications = Notification.objects.order_by('-created_at')
     return render(request, 'newsroom/notification_list.html', {'notifications': notifications})
 
 
-@login_required
 def notification_create(request):
     if request.method == 'POST':
         form = NotificationForm(request.POST)
@@ -543,13 +491,11 @@ def notification_create(request):
     return render(request, 'newsroom/notification_form.html', {'form': form})
 
 
-@login_required
 def audio_list(request):
     archives = AudioArchive.objects.order_by('-archived_at')
     return render(request, 'newsroom/audio_list.html', {'archives': archives})
 
 
-@login_required
 def audio_create(request):
     if request.method == 'POST':
         form = AudioArchiveForm(request.POST, request.FILES)
@@ -561,7 +507,6 @@ def audio_create(request):
     return render(request, 'newsroom/audio_form.html', {'form': form})
 
 
-@login_required
 def ai_assistant(request):
     result = None
     if request.method == 'POST':

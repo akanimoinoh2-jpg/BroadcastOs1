@@ -162,14 +162,5 @@ LOGGING = {
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-AUTHENTICATION_BACKENDS = [
-    'newsroom.auth_backends.EmailOrUsernameModelBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-LOGIN_REDIRECT_URL = 'newsroom:dashboard'
-LOGIN_URL = 'login'
-LOGOUT_REDIRECT_URL = 'login'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

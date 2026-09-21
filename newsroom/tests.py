@@ -10,45 +10,7 @@ User = get_user_model()
 
 
 class AuthFlowTests(TestCase):
-    def test_user_can_register_and_be_logged_in(self):
-        response = self.client.post(
-            reverse('newsroom:register'),
-            {
-                'username': 'reporter1',
-                'first_name': 'Amina',
-                'last_name': 'Khan',
-                'email': 'amina@example.com',
-                'role': 'reporter',
-                'password1': 'SecurePass123!',
-                'password2': 'SecurePass123!',
-            },
-            follow=False,
-        )
-
-        self.assertEqual(response.status_code, 302)
-        user = User.objects.get(username='reporter1')
-        self.assertTrue(user.check_password('SecurePass123!'))
-        self.assertTrue(UserProfile.objects.filter(user=user, role='reporter').exists())
-        self.assertEqual(int(self.client.session['_auth_user_id']), user.pk)
-
-    def test_user_can_log_in_with_email(self):
-        user = User.objects.create_user(
-            username='producer_test',
-            email='producer@example.com',
-            password='SecurePass123!',
-        )
-        UserProfile.objects.create(user=user, role='producer')
-
-        self.assertTrue(self.client.login(username='producer@example.com', password='SecurePass123!'))
-
-    def test_home_redirects_logged_in_users_to_dashboard(self):
-        user = User.objects.create_user(
-            username='dashboard_user',
-            email='dashboard@example.com',
-            password='SecurePass123!',
-        )
-        self.client.login(username='dashboard_user', password='SecurePass123!')
-
+    def test_home_redirects_to_dashboard(self):
         response = self.client.get(reverse('newsroom:home'))
         self.assertRedirects(response, reverse('newsroom:dashboard'))
 
@@ -58,7 +20,6 @@ class AuthFlowTests(TestCase):
             email='editor@example.com',
             password='SecurePass123!',
         )
-        self.client.login(username='editor_test', password='SecurePass123!')
 
         story = Story.objects.create(
             title='Election Coverage',
@@ -93,7 +54,6 @@ class AuthFlowTests(TestCase):
         self.assertTrue(ImageAssetForm(data={'title': 'Image draft', 'caption': 'No file attached'}).is_valid())
         self.assertTrue(VideoAssetForm(data={'title': 'Video draft', 'caption': 'No file attached'}).is_valid())
 
-        self.client.force_login(user)
         response = self.client.post(reverse('newsroom:image_upload', args=[story.slug]), {'title': 'No upload', 'caption': 'Optional'})
         self.assertEqual(response.status_code, 302)
 
@@ -101,9 +61,6 @@ class AuthFlowTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_ai_assistant_handles_submit_and_invalid_form(self):
-        user = User.objects.create_user(username='ai_user', email='ai_user@example.com', password='SecurePass123!')
-        self.client.force_login(user)
-
         response = self.client.post(
             reverse('newsroom:ai_assistant'),
             {'text': 'Breaking news from our station. The team reported several updates today.', 'action': 'summarize'}
